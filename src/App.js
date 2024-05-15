@@ -1,27 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import './App.css'; // Create and import a CSS file for styling
+import './App.css';
 
 function App() {
-    const [ipData, setIpData] = useState({
-        publicIp: '',
-        publicIpDetails: {},
-        localIp: '',
-        systemDetails: {}
-    });
+    const [publicIp, setPublicIp] = useState('');
+    const [publicIpDetails, setPublicIpDetails] = useState({});
+    const [localIpDetails, setLocalIpDetails] = useState({});
 
     useEffect(() => {
-        fetch('https://ipdetection-backend.onrender.com/api/ip')
+        // Fetch Public IP
+        fetch('https://api64.ipify.org?format=json')
             .then(response => response.json())
-            .then(data => setIpData(data))
-            .catch(error => console.error('Error fetching IP addresses:', error));
-    }, []);
+            .then(data => {
+                setPublicIp(data.ip);
+                // Fetch details using the public IP
+                return fetch(`http://ip-api.com/json/${data.ip}`);
+            })
+            .then(response => response.json())
+            .then(data => setPublicIpDetails(data))
+            .catch(error => console.error('Error fetching public IP details:', error));
 
-    const {
-        publicIp,
-        publicIpDetails,
-        localIp,
-        systemDetails
-    } = ipData;
+        // Fetch Local IP and system details
+        fetch('http://localhost:5000/api/ip')
+            .then(response => response.json())
+            .then(data => setLocalIpDetails(data))
+            .catch(error => console.error('Error fetching local IP and system details:', error));
+    }, []);
 
     return (
         <div className="App">
@@ -42,15 +45,15 @@ function App() {
                     </div>
                     <div className="card">
                         <h2>Local IP Address</h2>
-                        <p>{localIp}</p>
-                        {localIp && (
+                        <p>{localIpDetails.localIp}</p>
+                        {localIpDetails.systemDetails && (
                             <div className="details">
-                                <p><strong>OS Type:</strong> {systemDetails.osType}</p>
-                                <p><strong>Platform:</strong> {systemDetails.osPlatform}</p>
-                                <p><strong>OS Release:</strong> {systemDetails.osRelease}</p>
-                                <p><strong>Total Memory:</strong> {systemDetails.totalMemory}</p>
-                                <p><strong>Free Memory:</strong> {systemDetails.freeMemory}</p>
-                                <p><strong>CPUs:</strong> {systemDetails.cpus}</p>
+                                <p><strong>OS Type:</strong> {localIpDetails.systemDetails.osType}</p>
+                                <p><strong>Platform:</strong> {localIpDetails.systemDetails.osPlatform}</p>
+                                <p><strong>OS Release:</strong> {localIpDetails.systemDetails.osRelease}</p>
+                                <p><strong>Total Memory:</strong> {localIpDetails.systemDetails.totalMemory}</p>
+                                <p><strong>Free Memory:</strong> {localIpDetails.systemDetails.freeMemory}</p>
+                                <p><strong>CPUs:</strong> {localIpDetails.systemDetails.cpus}</p>
                             </div>
                         )}
                     </div>
