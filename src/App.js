@@ -10,7 +10,7 @@ function App() {
     });
 
     useEffect(() => {
-        fetch('http://localhost:5001/api/ip')
+        fetch('https://ipdetection-backend.onrender.com/api/ip')
             .then(response => response.json())
             .then(data => setIpData(data))
             .catch(error => console.error('Error fetching IP addresses:', error));
