@@ -20,7 +20,7 @@ function App() {
             .catch(error => console.error('Error fetching public IP details:', error));
 
         // Fetch Local IP and system details
-        fetch('http://localhost:5000/api/ip')
+        fetch('https://ipdetection-backend.onrender.com/api/ip')
             .then(response => response.json())
             .then(data => setLocalIpDetails(data))
             .catch(error => console.error('Error fetching local IP and system details:', error));
